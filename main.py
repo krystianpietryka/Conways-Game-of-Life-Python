@@ -13,7 +13,7 @@ def Random_start(x, y, percent_of_starting_active_cells):
 
     # Add rows to 2d list
     for k in range(0, x):
-            universe.append(list(temp))
+        universe.append(list(temp))
 
     # Initiate random coordinates, on which cells will become alive.
     for l in range(0, int(((x * y)/100) * percent_of_starting_active_cells)):
@@ -37,7 +37,7 @@ def Generation(universe, cells_x, cells_y, neighbours_to_reproduce, alive_margin
             cell = universe[row][column]
             n = 0
 
-            #   Check neighbours, sum the amount of alive ones
+            #   Check neighbours, sum up alive ones
             if row == 0:
                 if column == 0:
                     n += Alive_Check(universe, row + 1, column)
@@ -98,7 +98,7 @@ def Generation(universe, cells_x, cells_y, neighbours_to_reproduce, alive_margin
                     n += Alive_Check(universe, row - 1, column + 1)
                     n += Alive_Check(universe, row - 1, column - 1)
 
-            # Checks if a cell would be alive. If cell would change its state, mark it.
+            # If cell would change its state, mark it to be changed.
             n = str(n)
             if cell == 1:
                 if n not in list(alive_margin):
@@ -107,7 +107,7 @@ def Generation(universe, cells_x, cells_y, neighbours_to_reproduce, alive_margin
                 if n in list(neighbours_to_reproduce):
                     to_X.append((row,column))
 
-
+    # Change the states of marked cells
     for coordinate in to_0:
         universe[coordinate[0]][coordinate[1]] = 0
 
@@ -118,14 +118,13 @@ def Generation(universe, cells_x, cells_y, neighbours_to_reproduce, alive_margin
 
 
 def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_margin, disco_mode):
+    # Pygame stuff
     pygame.init()
     pygame.display.set_caption("Game of life")
-
     cell_size = 8
     generation = 1
     screen = pygame.display.set_mode((x * cell_size + 1, y * cell_size + 1))
     font = pygame.font.SysFont("Algerian",15)
-
     running = True
     grid = Generation(Random_start(x, y, percent_of_starting_active_cells), x, y, neighbours_to_reproduce, alive_margin)
     colours = [(220, 200, 255),(10, 200, 255), (220, 20, 255), (220, 200, 15), (220, 70, 15), (80, 10, 115), (00, 255, 15), (20, 100, 25)]
@@ -133,7 +132,7 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
     current_colour = random.randint(0,len(colours)-1)
     black = (0, 0, 0)
 
-    # main loop
+    # main game loop
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -144,6 +143,8 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
         column = 0
         grid = Generation(grid, x, y, neighbours_to_reproduce, alive_margin)
         vertical_step = 0
+
+        # Draw cells on screen
         for vertical in range(y):
             horizontal_step = 0
             row = 0
@@ -160,18 +161,19 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
                                          pygame.Rect(horizontal_step, vertical_step, cell_size, cell_size))
                 horizontal_step += cell_size
                 row += 1
-            column +=1
+            column += 1
             vertical_step += cell_size
         generation += 1
         pygame.display.flip()
         pygame.time.wait(50)
 
-        screen.fill(black)  # clear the screen
+        screen.fill(black)  # clear the screen for next generation
 
 
 sg.theme('LightBrown10')
 
 
+# UI
 def intro():
     layout = [[sg.Text('Welcome to Conway\'s Game of Life!', size=(40, 1))],
               [sg.Text('Choose parameters and watch!:', size=(40, 1))],
@@ -192,6 +194,7 @@ def intro():
     return sg.Window('Game of Life', layout, location=(600, 300), finalize=True)
 
 
+# PySimpleGUI loop
 def main():
     toggled_dict = {"a0":False, "a1": False, "a2": False, "a3": False, "a4": False,
                     "a5": False, "a6": False, "a7": False, "a8": False,
@@ -210,7 +213,6 @@ def main():
             if window == window2:
                 window2 = None
             elif window == window1:
-                window1 = None
                 break
         if event in ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8',
                      'b0', 'b1',  'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8',]:
