@@ -3,21 +3,22 @@ import pygame
 import PySimpleGUI as sg
 random.seed()
 
+
 def Random_start(x, y, percent_of_starting_active_cells):
     universe = []
     temp = []
-    #Row filled with zeroes
+    # Row filled with zeroes
     for r in range(0, x ):
         temp.append(0)
 
-    #Dodanie rzędów do listy list
+    # Add rows to 2d list
     for k in range(0, x):
             universe.append(list(temp))
 
-    #Zainicjowanie losowych koordynatow, w ktorych powstana aktywne komorki
+    # Initiate random coordinates, on which cells will become alive.
     for l in range(0, int(((x * y)/100) * percent_of_starting_active_cells)):
-        losowy = (random.randint(0, x -1), random.randint(0, x -1))
-        universe[losowy[0]][losowy[1]] = 1
+        random_coord = (random.randint(0, x -1), random.randint(0, x -1))
+        universe[random_coord[0]][random_coord[1]] = 1
     return universe
 
 
@@ -28,99 +29,92 @@ def Alive_Check(universe, x, y):
         return 0
 
 
-def Generation(uniwersum, cells_x, cells_y, neighbours_to_reproduce, alive_margin):
-    #for i in range(komorki_y):
-        #print(uniwersum[i])
-        #print('\n')
-    do_O = []
-    do_X = []
+def Generation(universe, cells_x, cells_y, neighbours_to_reproduce, alive_margin):
+    to_0 = []
+    to_X = []
     for row in range(0, cells_y):
         for column in range(0, cells_x):
-            komorka = uniwersum[row][column]
+            cell = universe[row][column]
             n = 0
 
-            #Check neighbours, sum the amount of alive ones
-            if (row == 0):
+            #   Check neighbours, sum the amount of alive ones
+            if row == 0:
                 if column == 0:
-                    n += Alive_Check(uniwersum, row + 1, column)
-                    n += Alive_Check(uniwersum, row, column + 1)
-                    n += Alive_Check(uniwersum, row + 1, column + 1)
+                    n += Alive_Check(universe, row + 1, column)
+                    n += Alive_Check(universe, row, column + 1)
+                    n += Alive_Check(universe, row + 1, column + 1)
 
                 elif (column == cells_x -1):
-                    n += Alive_Check(uniwersum, row + 1, column)
-                    n += Alive_Check(uniwersum, row + 1, column -1)
-                    n += Alive_Check(uniwersum, row, column-1)
+                    n += Alive_Check(universe, row + 1, column)
+                    n += Alive_Check(universe, row + 1, column -1)
+                    n += Alive_Check(universe, row, column-1)
 
                 else:
-                    n += Alive_Check(uniwersum, row + 1, column + 1)
-                    n += Alive_Check(uniwersum, row + 1, column)
-                    n += Alive_Check(uniwersum, row + 1, column -1)
-                    n += Alive_Check(uniwersum, row, column + 1)
-                    n += Alive_Check(uniwersum, row, column -1)
+                    n += Alive_Check(universe, row + 1, column + 1)
+                    n += Alive_Check(universe, row + 1, column)
+                    n += Alive_Check(universe, row + 1, column -1)
+                    n += Alive_Check(universe, row, column + 1)
+                    n += Alive_Check(universe, row, column -1)
 
-            elif (row == cells_x -1):
+            elif row == cells_x -1:
                 if column == 0:
-                    n += Alive_Check(uniwersum, row - 1, column)
-                    n += Alive_Check(uniwersum, row - 1, column + 1)
-                    n += Alive_Check(uniwersum, row, column + 1)
+                    n += Alive_Check(universe, row - 1, column)
+                    n += Alive_Check(universe, row - 1, column + 1)
+                    n += Alive_Check(universe, row, column + 1)
 
                 elif column == cells_x - 1:
-                    n += Alive_Check(uniwersum, row - 1, column)
-                    n += Alive_Check(uniwersum, row - 1, column - 1)
-                    n += Alive_Check(uniwersum, row, column - 1)
+                    n += Alive_Check(universe, row - 1, column)
+                    n += Alive_Check(universe, row - 1, column - 1)
+                    n += Alive_Check(universe, row, column - 1)
 
                 else:
-                    n += Alive_Check(uniwersum, row, column + 1)
-                    n += Alive_Check(uniwersum, row, column - 1)
-                    n += Alive_Check(uniwersum, row - 1, column)
-                    n += Alive_Check(uniwersum, row - 1, column + 1)
-                    n += Alive_Check(uniwersum, row - 1, column - 1)
+                    n += Alive_Check(universe, row, column + 1)
+                    n += Alive_Check(universe, row, column - 1)
+                    n += Alive_Check(universe, row - 1, column)
+                    n += Alive_Check(universe, row - 1, column + 1)
+                    n += Alive_Check(universe, row - 1, column - 1)
             else:
                 if column == 0:
-                    n += Alive_Check(uniwersum, row, column + 1)
-                    n += Alive_Check(uniwersum, row + 1, column)
-                    n += Alive_Check(uniwersum, row + 1, column + 1)
-                    n += Alive_Check(uniwersum, row - 1, column)
-                    n += Alive_Check(uniwersum, row - 1, column + 1)
+                    n += Alive_Check(universe, row, column + 1)
+                    n += Alive_Check(universe, row + 1, column)
+                    n += Alive_Check(universe, row + 1, column + 1)
+                    n += Alive_Check(universe, row - 1, column)
+                    n += Alive_Check(universe, row - 1, column + 1)
 
                 elif column == cells_x - 1:
-                    n += Alive_Check(uniwersum, row, column - 1)
-                    n += Alive_Check(uniwersum, row + 1, column)
-                    n += Alive_Check(uniwersum, row + 1, column - 1)
-                    n += Alive_Check(uniwersum, row - 1, column)
-                    n += Alive_Check(uniwersum, row - 1, column - 1)
+                    n += Alive_Check(universe, row, column - 1)
+                    n += Alive_Check(universe, row + 1, column)
+                    n += Alive_Check(universe, row + 1, column - 1)
+                    n += Alive_Check(universe, row - 1, column)
+                    n += Alive_Check(universe, row - 1, column - 1)
 
                 else:
-                    n += Alive_Check(uniwersum, row, column + 1)
-                    n += Alive_Check(uniwersum, row, column - 1)
-                    n += Alive_Check(uniwersum, row + 1, column)
-                    n += Alive_Check(uniwersum, row + 1, column + 1)
-                    n += Alive_Check(uniwersum, row + 1, column - 1)
-                    n += Alive_Check(uniwersum, row - 1, column)
-                    n += Alive_Check(uniwersum, row - 1, column + 1)
-                    n += Alive_Check(uniwersum, row - 1, column - 1)
+                    n += Alive_Check(universe, row, column + 1)
+                    n += Alive_Check(universe, row, column - 1)
+                    n += Alive_Check(universe, row + 1, column)
+                    n += Alive_Check(universe, row + 1, column + 1)
+                    n += Alive_Check(universe, row + 1, column - 1)
+                    n += Alive_Check(universe, row - 1, column)
+                    n += Alive_Check(universe, row - 1, column + 1)
+                    n += Alive_Check(universe, row - 1, column - 1)
 
-            #Sprawdza, czy komorka zyje dalej, jesli ma zmienic stan, oznacza ja na nastepne pokolenie
+            # Checks if a cell would be alive. If cell would change its state, mark it.
             n = str(n)
-            if komorka == 1:
+            if cell == 1:
                 if n not in list(alive_margin):
-                    do_O.append((row, column))
+                    to_0.append((row, column))
             else:
                 if n in list(neighbours_to_reproduce):
-                    do_X.append((row,column))
+                    to_X.append((row,column))
 
 
-    for koordynat in do_O:
-        uniwersum[koordynat[0]][koordynat[1]] = 0
+    for coordinate in to_0:
+        universe[coordinate[0]][coordinate[1]] = 0
 
-    for koordynat in do_X:
-        uniwersum[koordynat[0]][koordynat[1]] = 1
+    for coordinate in to_X:
+        universe[coordinate[0]][coordinate[1]] = 1
 
-    #print('\n\n\n')
-    #for i in range(komorki_y):
-        #print(uniwersum[i])
-        #print('\n')
-    return uniwersum
+    return universe
 
 
 def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_margin, disco_mode):
@@ -155,7 +149,7 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
             row = 0
             for horizontal in range(x):
                 if grid[column][row] == 1:
-                    if disco_mode == True:
+                    if disco_mode:
                         if current_colour > amount_of_colours -1:
                             current_colour = 0
                         pygame.draw.rect(screen, colours[current_colour],
@@ -171,11 +165,12 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
         generation += 1
         pygame.display.flip()
         pygame.time.wait(50)
-        #clear the screen
-        screen.fill((black))
+
+        screen.fill(black)  # clear the screen
 
 
 sg.theme('LightBrown10')
+
 
 def intro():
     layout = [[sg.Text('Welcome to Conway\'s Game of Life!', size=(40, 1))],
@@ -195,6 +190,7 @@ def intro():
                sg.Button('8', size=(2,1),  key='b8')],
               [sg.Button('Run!'), sg.Button('Disco mode!'), sg.Button('Exit')]]
     return sg.Window('Game of Life', layout, location=(600, 300), finalize=True)
+
 
 def main():
     toggled_dict = {"a0":False, "a1": False, "a2": False, "a3": False, "a4": False,
@@ -243,3 +239,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
