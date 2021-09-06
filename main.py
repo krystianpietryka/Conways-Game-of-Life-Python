@@ -1,6 +1,7 @@
 import random
 import pygame
 import PySimpleGUI as sg
+import sys
 
 random.seed()
 
@@ -123,10 +124,10 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
     pygame.init()
     pygame.display.set_caption("Game of life")
     cell_size = 8
+    running = True
     generation = 1
     screen = pygame.display.set_mode((x * cell_size + 1, y * cell_size + 1))
     font = pygame.font.SysFont("Algerian", 15)
-    running = True
     grid = Generation(Random_start(x, y, percent_of_starting_active_cells), x, y, neighbours_to_reproduce, alive_margin)
     colours = [(220, 200, 255), (10, 200, 255), (220, 20, 255), (220, 200, 15), (220, 70, 15), (80, 10, 115),
                (00, 255, 15), (20, 100, 25)]
@@ -139,6 +140,8 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()
+                sys.exit()
         img = font.render(str("Gen: " + str(generation)), True, (255, 255, 255))
         img.set_alpha(127)
         screen.blit(img, (0, 0))
@@ -200,11 +203,11 @@ def intro():
 
 # PySimpleGUI loop
 def main():
+    # Stores toggled buttons
     toggled_dict = {"a0": False, "a1": False, "a2": False, "a3": False, "a4": False,
                     "a5": False, "a6": False, "a7": False, "a8": False,
                     "b0": False, "b1": False, "b2": False, "b3": False, "b4": False,
                     "b5": False, "b6": False, "b7": False, "b8": False, }
-
     are_toggled = []
     digits1 = []
     digits2 = []
@@ -214,10 +217,11 @@ def main():
         window, event, values = sg.read_all_windows()
         if event == sg.WIN_CLOSED or event == 'Exit':
             window.close()
-            if window == window2:
+            if window == window2:  # if closing win 2, mark as closed
                 window2 = None
-            elif window == window1:
+            elif window == window1:  # if closing win 1, exit program
                 break
+        # Toggles buttons on and off
         if event in ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8',
                      'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', ]:
             toggled_dict[event] = not (toggled_dict[event])
