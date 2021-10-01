@@ -1,4 +1,4 @@
-# GameOfLife
+# GameOfLife-Python
 ## Description
 Conway's Game of life with changeable parameters and generation counter. Try Disco Mode!\
 Written in Python. I also have a C# version [HERE] (https://github.com/Kkomek21/Conways-Game-of-Life-Csharp)
