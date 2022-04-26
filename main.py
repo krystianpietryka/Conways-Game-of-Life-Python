@@ -4,24 +4,36 @@ import pygame
 import PySimpleGUI as sg
 import sys
 
-random.seed()
+# TODO Add possibility of choosing colour
+# TODO Fix random chance of being alive
+
+
+
+def Random_Chance_Of_Starting_Alive(chance_percent):
+    random_chance = random.randint(0,100)
+    if random_chance >= chance_percent:
+        return 1
+    else:
+        return 0
 
 
 def Random_start(x, y, percent_of_starting_active_cells):
     universe = []
     temp = []
-    # Row filled with zeroes
-    for r in range(0, x):
-        temp.append(0)
+    percent_count = 0
 
-    # Add rows to 2d list
-    for k in range(0, x):
-        universe.append(list(temp))
+    # Create list of lists of size x by y, every cell has percent_of_starting_active_cells chance of starting as 1
+    for row in range(0, x):
+        for cell in range(0, x):
+            temp.append(Random_Chance_Of_Starting_Alive(percent_of_starting_active_cells))
+        
+        for i in temp:
+            if i == 1:
+                percent_count += 1
+        universe.append(list(temp))  
+    
 
-    # Initiate random coordinates, on which cells will become alive.
-    for cell in range(0, int(((x * y) / 100) * percent_of_starting_active_cells)):
-        random_coord = (random.randint(0, x - 1), random.randint(0, x - 1))
-        universe[random_coord[0]][random_coord[1]] = 1
+    print(int(percent_count/(x*y)))
     return universe
 
 
@@ -120,7 +132,14 @@ def Generation(universe, cells_x, cells_y, neighbours_to_reproduce, alive_margin
     return universe
 
 
-def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_margin, disco_mode):
+def Game(
+    x,
+    y,
+    percent_of_starting_active_cells,
+    neighbours_to_reproduce,
+    alive_margin,
+    disco_mode,
+):
     # Pygame stuff
     pygame.init()
     pygame.display.set_caption("Game of life")
@@ -129,9 +148,23 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
     generation = 1
     screen = pygame.display.set_mode((x * cell_size + 1, y * cell_size + 1))
     font = pygame.font.SysFont("Algerian", 15)
-    grid = Generation(Random_start(x, y, percent_of_starting_active_cells), x, y, neighbours_to_reproduce, alive_margin)
-    colours = [(220, 200, 255), (10, 200, 255), (220, 20, 255), (220, 200, 15), (220, 70, 15), (80, 10, 115),
-               (00, 255, 15), (20, 100, 25)]
+    grid = Generation(
+        Random_start(x, y, percent_of_starting_active_cells),
+        x,
+        y,
+        neighbours_to_reproduce,
+        alive_margin,
+    )
+    colours = [
+        (220, 200, 255),
+        (10, 200, 255),
+        (220, 20, 255),
+        (220, 200, 15),
+        (220, 70, 15),
+        (80, 10, 115),
+        (00, 255, 15),
+        (20, 100, 25),
+    ]
     amount_of_colours = len(colours)
     current_colour = random.randint(0, len(colours) - 1)
     black = (0, 0, 0)
@@ -159,12 +192,22 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
                     if disco_mode:
                         if current_colour > amount_of_colours - 1:
                             current_colour = 0
-                        pygame.draw.rect(screen, colours[current_colour],
-                                         pygame.Rect(horizontal_step, vertical_step, cell_size, cell_size))
+                        pygame.draw.rect(
+                            screen,
+                            colours[current_colour],
+                            pygame.Rect(
+                                horizontal_step, vertical_step, cell_size, cell_size
+                            ),
+                        )
                         current_colour += 1
                     else:
-                        pygame.draw.rect(screen, colours[current_colour],
-                                         pygame.Rect(horizontal_step, vertical_step, cell_size, cell_size))
+                        pygame.draw.rect(
+                            screen,
+                            colours[current_colour],
+                            pygame.Rect(
+                                horizontal_step, vertical_step, cell_size, cell_size
+                            ),
+                        )
                 horizontal_step += cell_size
                 row += 1
             column += 1
@@ -176,39 +219,77 @@ def Game(x, y, percent_of_starting_active_cells, neighbours_to_reproduce, alive_
         screen.fill(black)  # clear the screen for next generation
 
 
-sg.theme('LightBrown10')
+sg.theme("LightBrown10")
 
 
 # UI
 def intro():
-    layout = [[sg.Text('Welcome to Conway\'s Game of Life!', size=(40, 1))],
-              [sg.Text('Choose parameters and watch!:', size=(40, 1))],
-              [sg.Text('Neighbours to stay alive:', size=(35, 1)), sg.Button('0', size=(2, 1), key='a0'),
-               sg.Button('1', size=(2, 1), key='a1'),
-               sg.Button('2', size=(2, 1), key='a2'), sg.Button('3', size=(2, 1), key='a3'),
-               sg.Button('4', size=(2, 1), key='a4'), sg.Button('5', size=(2, 1), key='a5'),
-               sg.Button('6', size=(2, 1), key='a6'), sg.Button('7', size=(2, 1), key='a7'),
-               sg.Button('8', size=(2, 1), key='a8')],
-              [sg.Text('Percent of alive cells at the start:', size=(35, 1)),
-               sg.Slider((1, 99), key='alive_percent', orientation='h', enable_events=True,
-                         disable_number_display=False, default_value=25)],
-              [sg.Text('Neighbours to reproduce:', size=(35, 1)), sg.Button('0', size=(2, 1), key='b0'),
-               sg.Button('1', size=(2, 1), key='b1'), sg.Button('2', size=(2, 1), key='b2'),
-               sg.Button('3', size=(2, 1), key='b3'), sg.Button('4', size=(2, 1), key='b4'),
-               sg.Button('5', size=(2, 1), key='b5'),
-               sg.Button('6', size=(2, 1), key='b6'), sg.Button('7', size=(2, 1), key='b7'),
-               sg.Button('8', size=(2, 1), key='b8')],
-              [sg.Button('Run!'), sg.Button('Disco mode!'), sg.Button('Exit')]]
-    return sg.Window('Game of Life', layout, location=(600, 300), finalize=True)
+    layout = [
+        [sg.Text("Welcome to Conway's Game of Life!", size=(40, 1))],
+        [sg.Text("Choose parameters and watch!:", size=(40, 1))],
+        [
+            sg.Text("Neighbours to stay alive:", size=(35, 1)),
+            sg.Button("0", size=(2, 1), key="a0"),
+            sg.Button("1", size=(2, 1), key="a1"),
+            sg.Button("2", size=(2, 1), key="a2"),
+            sg.Button("3", size=(2, 1), key="a3"),
+            sg.Button("4", size=(2, 1), key="a4"),
+            sg.Button("5", size=(2, 1), key="a5"),
+            sg.Button("6", size=(2, 1), key="a6"),
+            sg.Button("7", size=(2, 1), key="a7"),
+            sg.Button("8", size=(2, 1), key="a8"),
+        ],
+        [
+            sg.Text("Percent of alive cells at the start:", size=(35, 1)),
+            sg.Slider(
+                (1, 99),
+                key="alive_percent",
+                orientation="h",
+                enable_events=True,
+                disable_number_display=False,
+                default_value=25,
+            ),
+        ],
+        [
+            sg.Text("Neighbours to reproduce:", size=(35, 1)),
+            sg.Button("0", size=(2, 1), key="b0"),
+            sg.Button("1", size=(2, 1), key="b1"),
+            sg.Button("2", size=(2, 1), key="b2"),
+            sg.Button("3", size=(2, 1), key="b3"),
+            sg.Button("4", size=(2, 1), key="b4"),
+            sg.Button("5", size=(2, 1), key="b5"),
+            sg.Button("6", size=(2, 1), key="b6"),
+            sg.Button("7", size=(2, 1), key="b7"),
+            sg.Button("8", size=(2, 1), key="b8"),
+        ],
+        [sg.Button("Run!"), sg.Button("Disco mode!"), sg.Button("Exit")],
+    ]
+    return sg.Window("Game of Life", layout, location=(600, 300), finalize=True)
 
 
 # PySimpleGUI loop
 def main():
     # Stores toggled buttons
-    toggled_dict = {"a0": False, "a1": False, "a2": False, "a3": False, "a4": False,
-                    "a5": False, "a6": False, "a7": False, "a8": False,
-                    "b0": False, "b1": False, "b2": False, "b3": False, "b4": False,
-                    "b5": False, "b6": False, "b7": False, "b8": False, }
+    toggled_dict = {
+        "a0": False,
+        "a1": False,
+        "a2": False,
+        "a3": False,
+        "a4": False,
+        "a5": False,
+        "a6": False,
+        "a7": False,
+        "a8": False,
+        "b0": False,
+        "b1": False,
+        "b2": False,
+        "b3": False,
+        "b4": False,
+        "b5": False,
+        "b6": False,
+        "b7": False,
+        "b8": False,
+    }
     are_toggled = []
     digits1 = []
     digits2 = []
@@ -216,15 +297,33 @@ def main():
     disco_mode = False
     while True:
         window, event, values = sg.read_all_windows()
-        if event == sg.WIN_CLOSED or event == 'Exit':
+        if event == sg.WIN_CLOSED or event == "Exit":
             window.close()
             if window == window2:  # if closing win 2, mark as closed
                 window2 = None
             elif window == window1:  # if closing win 1, exit program
                 break
         # Toggles buttons on and off
-        if event in ['a0', 'a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8',
-                     'b0', 'b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8', ]:
+        if event in [
+            "a0",
+            "a1",
+            "a2",
+            "a3",
+            "a4",
+            "a5",
+            "a6",
+            "a7",
+            "a8",
+            "b0",
+            "b1",
+            "b2",
+            "b3",
+            "b4",
+            "b5",
+            "b6",
+            "b7",
+            "b8",
+        ]:
             toggled_dict[event] = not (toggled_dict[event])
             for key in toggled_dict:
                 if toggled_dict[key]:
@@ -233,17 +332,21 @@ def main():
                 else:
                     if key in are_toggled:
                         are_toggled.remove(key)
-            window.Element(event).Update(button_color=(('DeepPink4', 'blue4')[toggled_dict[event]]))
-        if event == 'Disco mode!':
+            window.Element(event).Update(
+                button_color=(("DeepPink4", "blue4")[toggled_dict[event]])
+            )
+        if event == "Disco mode!":
             disco_mode = not disco_mode
-            window.Element('Disco mode!').Update(button_color=(('DeepPink4', 'blue4')[disco_mode]))
-        if event == 'Run!':
+            window.Element("Disco mode!").Update(
+                button_color=(("DeepPink4", "blue4")[disco_mode])
+            )
+        if event == "Run!":
             for e in are_toggled:
-                if e[0] == 'a':
+                if e[0] == "a":
                     digits1.append(e[1])
                 else:
                     digits2.append(e[1])
-            Game(180, 90, int(values['alive_percent']), digits2, digits1, disco_mode)
+            Game(180, 90, int(values["alive_percent"]), digits2, digits1, disco_mode)
 
     window.close()
 
